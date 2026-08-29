@@ -12,6 +12,8 @@
 import type { FastifyInstance } from "fastify";
 import type { ToolRuntime } from "./runtime.js";
 import { listTools as mcplList, callTool as mcplCall } from "./mcp.js";
+import { loadApiConfig } from "@aervox/config";
+import { probeMcpServers } from "./mcp-bridge.js";
 import { resolveTenant } from "../../shared/tenant.js";
 
 export function registerToolRoutes(app: FastifyInstance, runtime: ToolRuntime): void {
@@ -102,4 +104,13 @@ export function registerToolRoutes(app: FastifyInstance, runtime: ToolRuntime): 
 
   // MCP 形态列表（供运行时探测）
   app.get("/v1/tools/mcp/list", async () => mcplList(runtime));
+
+  // CR-029：外接 MCP Server 探测（env AERVOX_MCP_SERVERS；含 Token 连通性与工具清单）
+  app.get("/v1/tools/mcp/external", async (req) => {
+    resolveTenant(req);
+    const { force } = (req.query ?? {}) as { force?: string };
+    const servers = loadApiConfig().mcpServers;
+    const probes = await probeMcpServers(servers, { forceRefresh: force === "1" });
+    return { servers: probes };
+  });
 }

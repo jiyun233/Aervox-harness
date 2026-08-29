@@ -1,7 +1,7 @@
 # Aervox｜思隅 产品与工程文档索引
 
 - 提出人：3yearszhuang · 2026-08-26
-- 修改人：MoeJiyun233 · 2026-08-29
+- 修改人：MoeJiyun233 · 2026-08-30
 
 > 文档编号：AVX-DOC-001  
 > 版本：v1.3
@@ -38,6 +38,7 @@
 | [主动智能模式](explanation/proactive-intelligence-mode.md)（AVX-EXPL-008） | 完全访问上如何以广域画像授权、OS 能力、特权观察 Host、本地私密数据和主动操作组合既有 CAP | 评审提案；不替代 PRD/SRS/DATA_PRIVACY/ADR，不表示运行时已实现 |
 | [CR-024 主动智能能力套件与外部环境连接](reference/changes/CR-024-proactive-intelligence-suite-integrations.md) | 十二项主动智能能力与 HA/小米健康如何进入产品基线 | 已接受差量、实现位置、验证和回滚；关联 CAP-033～035 |
 | [CR-028 在线语音模型配置](reference/changes/CR-028-voice-remote-model-config.md) | 设置 UI 如何配置在线语音模型（GPT-SoVITS 远程 API）并按 api_v2 协议合成 | 远程配置持久化与热生效、`/v1/voice/remote/*` 端点、api_v2 请求体与连通性测试；关联 CAP-019/020 |
+| [CR-029 出站 MCP 客户端与外部工具桥](reference/changes/CR-029-mcp-outbound-client.md) | 如何把外部 MCP Server（如麦当劳 open.mcd.cn）的工具接进 Agent 工具体系 | AERVOX_MCP_SERVERS 配置、Streamable HTTP 客户端、工具命名空间与审批分级；关联 CAP-020 |
 | [ADR-019 主动智能外部连接本地网关](reference/adr/ADR-019-proactive-integrations-local-gateway.md) | 外部连接为何使用本地网关、加密凭据和受控工具 | 已接受的 HA REST/WS、小米 OAuth/每日指标、白名单与撤销边界 |
 | [文档写作规范](reference/standards/doc-standards.md)（AVX-STD-001） | 每份文档如何使用模板、命名、写作并通过门禁 | 写作体例、签名、命名、风格基线、Vale 术语门禁与模板族；治理规则见 AVX-DOC-GOV-001 |
 | [术语表](reference/standards/terminology.md)（AVX-TERM-001） | 项目术语的唯一含义与规范写法 | 缩写/产品名唯一语义；Vale 依据「禁写」列自动校验 |

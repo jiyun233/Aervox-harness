@@ -41,6 +41,7 @@ import type {
 } from "@aervox/database";
 import { loadApiConfig } from "@aervox/config";
 import type { ToolRuntime } from "../tools/runtime.js";
+import { createMcpToolProvider } from "../tools/mcp-bridge.js";
 import type { LLMConfigService } from "../llm/service.js";
 import { getRequestToolApprovalMode } from "../../shared/tool-approval-policy.js";
 import {
@@ -588,6 +589,15 @@ export async function runLoopTurnOnce(
   }
   if (deps.practiceAttemptPort) {
     contribution.push(createPracticeAttemptToolProvider({ practiceAttemptPort: deps.practiceAttemptPort }));
+  }
+  // CR-029：外接 MCP Server（env AERVOX_MCP_SERVERS）工具并入贡献清单——
+  // 经同一授权闸门（写操作需授权/完全访问），拉取失败的 Server 跳过不阻断对话。
+  const mcpServers = loadApiConfig().mcpServers;
+  if (mcpServers.length > 0) {
+    const mcpProvider = await createMcpToolProvider(mcpServers);
+    if (mcpProvider) {
+      contribution.push(mcpProvider);
+    }
   }
   const contributionProvider =
     contribution.length > 0

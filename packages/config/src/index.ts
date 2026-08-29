@@ -43,6 +43,20 @@ export interface AsrConfig {
   whisperModelId: string;
 }
 
+/** 出站 MCP Server 配置（AERVOX_MCP_SERVERS，JSON 数组；CR-029） */
+export interface McpServerConfig {
+  /** 服务标识（用于工具命名空间 mcp_<id>_<tool>，需匹配 [a-z0-9_-]） */
+  id: string;
+  /** 展示名（缺省用 id） */
+  name?: string;
+  /** Streamable HTTP 端点（如 https://mcp.mcd.cn） */
+  url: string;
+  /** Bearer Token（写入 Authorization: Bearer <token>；缺省表示无鉴权） */
+  token?: string;
+  /** 是否启用（缺省 true） */
+  enabled?: boolean;
+}
+
 /** @aervox/api 启动与运行时配置 */
 export interface ApiConfig {
   /** HTTP 监听端口（PORT，默认 3000） */
@@ -57,6 +71,8 @@ export interface ApiConfig {
   adminIds: string[];
   gptSovits: GptSovitsConfig;
   asr: AsrConfig;
+  /** 出站 MCP Server 清单（AERVOX_MCP_SERVERS JSON；解析失败安全降级为空数组） */
+  mcpServers: McpServerConfig[];
 }
 
 /** @aervox/worker 运行时配置 */
@@ -139,7 +155,53 @@ export function loadApiConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
       whisperApiKey: env.WHISPER_API_KEY?.trim() || undefined,
       whisperModelId: env.WHISPER_MODEL_ID?.trim() || "whisper-1",
     },
+    mcpServers: parseMcpServers(env.AERVOX_MCP_SERVERS),
   };
+}
+
+/**
+ * 解析出站 MCP Server 清单（AERVOX_MCP_SERVERS，JSON 数组）。
+ * 配置非法（非 JSON/缺 id/url）时丢弃非法项并 console.warn——外接 MCP 属增强能力，
+ * 不因配置错误阻断 API 启动；启用开关 enabled === false 的项过滤。
+ */
+export function parseMcpServers(raw: string | undefined): McpServerConfig[] {
+  const text = raw?.trim();
+  if (!text) return [];
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    console.warn(
+      "[config] AERVOX_MCP_SERVERS 不是合法 JSON，外接 MCP Server 全部忽略：",
+      error instanceof Error ? error.message : error,
+    );
+    return [];
+  }
+  if (!Array.isArray(parsed)) {
+    console.warn("[config] AERVOX_MCP_SERVERS 应为 JSON 数组，已忽略");
+    return [];
+  }
+  const servers: McpServerConfig[] = [];
+  for (const item of parsed) {
+    const candidate = item as Partial<McpServerConfig> | null;
+    const id = typeof candidate?.id === "string" ? candidate.id.trim().toLowerCase() : "";
+    const url = typeof candidate?.url === "string" ? candidate.url.trim() : "";
+    if (
+      !/^[a-z0-9_-]+$/.test(id) ||
+      !/^https?:\/\//.test(url)
+    ) {
+      console.warn(`[config] AERVOX_MCP_SERVERS 项非法（id 需匹配 [a-z0-9_-]，url 需 http(s)）：${id || "(空)"}`);
+      continue;
+    }
+    if (candidate?.enabled === false) continue;
+    servers.push({
+      id,
+      ...(typeof candidate?.name === "string" && candidate.name.trim() ? { name: candidate.name.trim() } : {}),
+      url,
+      ...(typeof candidate?.token === "string" && candidate.token.trim() ? { token: candidate.token.trim() } : {}),
+    });
+  }
+  return servers;
 }
 
 /** 加载 @aervox/worker 配置（可注入 env 便于测试；默认读取进程环境变量） */
