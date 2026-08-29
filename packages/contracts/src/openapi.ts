@@ -24,8 +24,11 @@ import {
   diarySchema,
   diaryWriteToolInputSchema,
   diaryWriteToolOutputSchema,
+  diaryListResponseSchema,
+  diaryGenerateTodayOutputSchema,
   toolApprovalRequiredEventDataSchema,
   messageEventDataSchema,
+  reasoningDeltaEventDataSchema,
   petCommandSchema,
   petManifestSchema,
   petSheetLayoutSchema,
@@ -165,6 +168,7 @@ registry.register("CancelTurnResponse", cancelTurnResponseSchema);
 registry.register("TurnStreamEvent", turnStreamEventSchema);
 registry.register("MessageEventData", messageEventDataSchema);
 registry.register("DeltaEventData", deltaEventDataSchema);
+registry.register("ReasoningDeltaEventData", reasoningDeltaEventDataSchema);
 registry.register("DoneEventData", doneEventDataSchema);
 registry.register("ErrorEventData", errorEventDataSchema);
 registry.register("RedactedEventData", redactedEventDataSchema);
@@ -179,6 +183,8 @@ registry.register("MemoryStoreToolOutput", memoryStoreToolOutputSchema);
 registry.register("Diary", diarySchema);
 registry.register("DiaryWriteToolInput", diaryWriteToolInputSchema);
 registry.register("DiaryWriteToolOutput", diaryWriteToolOutputSchema);
+registry.register("DiaryListResponse", diaryListResponseSchema);
+registry.register("DiaryGenerateTodayOutput", diaryGenerateTodayOutputSchema);
 registry.register("ToolApprovalRequiredEventData", toolApprovalRequiredEventDataSchema);
 registry.register("PetSheetState", petSheetStateSchema);
 registry.register("PetSheetLayout", petSheetLayoutSchema);

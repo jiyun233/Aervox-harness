@@ -1,0 +1,28 @@
+{
+  "name": "@aervox/diary",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aervox/agent-loop": "workspace:*",
+    "@aervox/contracts": "workspace:*",
+    "@aervox/database": "workspace:*",
+    "drizzle-orm": "^0.39.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "7.0.2",
+    "vitest": "4.0.18"
+  }
+}
